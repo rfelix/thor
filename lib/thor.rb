@@ -239,4 +239,13 @@ class Thor
   def help(task=nil)
     self.class.help(shell, task, :namespace => task && task.include?(?:))
   end
+  
+  map "-f" => :load_thor_file
+  desc "load_thor_file [FILE] [THOR ARGUMENTS]", "Use specified Thorfile"
+  def load_thor_file(file, *rest) 
+    Thor::Util.load_thorfile(file)
+    # Remove the left over argument (-f is already taken away by Thor)
+    args = ARGV - [file] 
+    Thor::Runner.start(args)
+  end
 end

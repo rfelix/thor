@@ -66,6 +66,20 @@ describe Thor::Runner do
       ARGV.replace ["my_counter", "1", "2", "--third", "3"]
       Thor::Runner.start.must == [1, 2, 3]
     end
+    
+    it "invokes a task from an included Thor file" do  
+      # Make sure separate was not loaded
+      mock(Thor::Runner).exit(1)
+      ARGV.replace ["separate:hello"]
+      capture(:stderr){ Thor::Runner.start }.must =~ /could not find Thor class or task 'separate:hello'/
+      # Now make sure we can run the task
+      ARGV.replace [
+        "-f", 
+        File.join(File.dirname(__FILE__), "fixtures", "separate.thor"), 
+        "separate:hello"
+      ]
+      Thor::Runner.start.must == "Hello"
+    end
 
     it "raises an error if class/task can't be found" do
       mock(Thor::Runner).exit(1)
